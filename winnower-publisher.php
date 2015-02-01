@@ -4,7 +4,7 @@ Plugin Name: The Winnower Publisher
 Plugin URI: https://thewinnower.com
 Description: Publish, peer review and get cited with your own DOI by cross posting to thewinnower.com.
 Author: The Winnower
-Version: 1.3
+Version: 1.4
 Author URI: https://thewinnower.com
 Plugin Type: Piklist
 License: GPL2
@@ -25,15 +25,27 @@ function winnower_piklist_check() {
   }
 }
 
-do_action('activated_plugin', 'winnower_set_default_settings');
+add_action('activated_plugin', 'winnower_set_default_settings');
 function winnower_set_default_settings(){
-  add_option('winnower_publisher_settings', array(
-    'api_endpoint' => 'https://thewinnower.com/api/',
-    'display_cite_link' => false
-  ));
   delete_option('winnower_topics');
   delete_option('winnower_topics_set');
   delete_option('winnower_topics_json');
+
+  $default_options = array(
+    'api_endpoint' => 'https://thewinnower.com/api/',
+    'display_cite_link' => false
+  );
+
+  $new = add_option('winnower_publisher_settings', $default_options);
+
+  if (!$new) {
+    $options = get_option('winnower_publisher_settings');
+    if(!array_key_exists('api_endpoint', $options) || !$options['api_endpoint']){
+      $options['api_endpoint'] = $default_options['api_endpoint'];
+    }
+
+    update_option('winnower_publisher_settings', $options);
+  }
 }
 
 add_filter('piklist_admin_pages', 'winnower_publisher_admin_pages');

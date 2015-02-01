@@ -1,8 +1,8 @@
-=== Winnower Publisher ===
+=== The Winnower Publisher ===
 Contributors: reconbot
 Tags: winnower, academic, publishing, DOI, piklist
 Requires at least: 4.0
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: trunk
 License: GPLv2 or later
 

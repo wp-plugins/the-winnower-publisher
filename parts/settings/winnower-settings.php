@@ -4,6 +4,8 @@ Title:
 Setting: winnower_publisher_settings
 */
 
+$debug = $_GET['debug'];
+
 piklist('field', array(
   'type' => 'text',
   'field' => 'api_key',
@@ -43,9 +45,16 @@ piklist('field', array(
 ));
 
 piklist('field', array(
-  'type' => 'hidden',
+  'type' => $debug ? 'text' : 'hidden',
+  'label' => $debug ? 'Api Endpoint' : false,
   'field' => 'api_endpoint',
 ));
+
+if($debug){
+  echo '<pre>';
+  var_dump(get_option('winnower_publisher_settings'));
+  echo '</pre>';
+}
 
 echo '<script>
     (function($){
@@ -54,6 +63,12 @@ echo '<script>
         var keyField = $(".winnower_api_key");
         function checkKey() {
           var endPoint = $("#winnower_publisher_settings_api_endpoint_0").val();
+
+          if (!endPoint) {
+            status.text("No api endpoint set, please deactivate and activate this plugin.");
+            return;
+          }
+
           var url = endPoint + "current_user?api_key=";
           var apiKey = keyField.val();
           var checkUrl = url + apiKey;
