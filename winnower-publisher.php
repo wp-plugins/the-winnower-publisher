@@ -4,7 +4,7 @@ Plugin Name: The Winnower Publisher
 Plugin URI: https://thewinnower.com
 Description: Publish, peer review and get cited with your own DOI by cross posting to thewinnower.com.
 Author: The Winnower
-Version: 1.4
+Version: 1.5
 Author URI: https://thewinnower.com
 Plugin Type: Piklist
 License: GPL2
@@ -33,7 +33,8 @@ function winnower_set_default_settings(){
 
   $default_options = array(
     'api_endpoint' => 'https://thewinnower.com/api/',
-    'display_cite_link' => false
+    'display_cite_link' => false,
+    'api_key' => ""
   );
 
   $new = add_option('winnower_publisher_settings', $default_options);
@@ -105,7 +106,7 @@ function winnower_post_published($ID, $post) {
     update_post_meta($ID, 'pub', 'This paper can no longer be updated.');
     return;
   }
-  $title = $post->post_title;
+  $title = strip_tags($post->post_title);
 
   // This is an ugly hack to keep our citation link from showing on the winnower.com
   $winnower_skip_cite_link = true;
@@ -119,12 +120,27 @@ function winnower_post_published($ID, $post) {
 
   $topics = array_merge($topic, $sub_1, $sub_2, $sub_3);
 
+  $author = get_userdata($post->post_author);
+
+  $url = get_permalink($post->id);
+
   $body = array(
     'posts' => array(
       'title' => $title,
       'content' => $html,
       'blog_post_id' => $ID,
-      'topics' => $topics
+      'topics' => $topics,
+      'links' => array(
+        'self' => $url
+      ),
+      'authors' => array(
+        array(
+          "first_name" => $author->user_firstname,
+          "last_name" => $author->user_lastname,
+          "email" => $author->user_email,
+          "is_corresponding" => true
+        )
+      )
     )
   );
   $body = json_encode($body);
@@ -194,8 +210,10 @@ function winnower_parse_response($response_array) {
       $fields = $errors['fields'];
       if($errors) {
         $err_message = '<span title="'.$errors['status'].'">There was a problem submitting your post to The Winnower.</span><br><ul>';
-        foreach($fields as $error) {
-          $err_message .= '<li>'.$error.'</li>';
+        if (is_array($fields)) {
+          foreach($fields as $error) {
+            $err_message .= '<li>'.$error.'</li>';
+          }
         }
         $err_message .= '</ul>';
         return $err_message;
@@ -222,9 +240,9 @@ function winnower_cite_link($content) {
     $DOI = get_post_meta($post->ID, 'doi-status', true);
 
     if($DOI) {
-      $content .= '<p class="winnower-cite-link">DOI: <a target="_blank" href="https://dx.doi.org/'.$DOI.'">'.$DOI.'</a> provided by <a href="https://thewinnower.com">The Winnower</a>, an open platform for review.</p>';
+      $content .= '<p class="winnower-cite-link">DOI: <a target="_blank" href="https://dx.doi.org/'.$DOI.'">'.$DOI.'</a> provided by <a href="https://thewinnower.com">The Winnower</a>, a DIY scholarly publishing platform</p>';
     } else if($cite_url) {
-      $content .= '<p class="winnower-cite-link"><a target="_blank" href="'.$cite_url.'">This paper is currently available for review at The Winnower.</a></p>';
+      $content .= '<p class="winnower-cite-link"><a target="_blank" href="'.$cite_url.'">This post is open to read and review on The Winnower.</a></p>';
     }
   }
 
@@ -292,15 +310,11 @@ class Winnower_Badge extends WP_Widget {
     $api_key_confirmation = $winnower_settings['api_key_confirmation'];
     $api_endpoint = $winnower_settings['api_endpoint'];
     $blog_id = $winnower_settings['user_blog_id'];
-    $ID = $post->ID;
-    $pub_status = get_post_meta($ID, 'win_toggle', true);
+    $pub_status = get_post_meta($post->ID, 'win_toggle', true);
 
     if($api_key_confirmation == 'true' && $pub_status == 'true' && !is_home()) {
-      $iframe_src = $api_endpoint . "blog_badge?";
-
-      echo $before_widget;
-      echo "<iframe src=\"${iframe_src}blog_id=${blog_id}&blog_post_id=${ID}\" width=\"1000\" height=\"440\"></iframe>";
-      echo $after_widget;
+      $iframe_src = $api_endpoint . "blog_badge?blog_id=${blog_id}&blog_post_id={$post->ID}";
+      echo "<iframe id=\"js-winnower-publisher-frame\" src=\"${iframe_src}\" width=\"1000\" height=\"440\"></iframe>";
     }
   }
 }
