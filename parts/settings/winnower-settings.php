@@ -4,7 +4,7 @@ Title:
 Setting: winnower_publisher_settings
 */
 
-$debug = $_GET['debug'];
+$debug = isset($_GET['debug']) ? true : false;
 
 piklist('field', array(
   'type' => 'text',
