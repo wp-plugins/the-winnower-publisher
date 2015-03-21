@@ -11,23 +11,13 @@ Archiving and Aggregating “Alternative” Scholarly Content: DOIs for blogs.
 == Description ==
 Assign a CrossRef digital object identifier (DOI) to your blog via The Winnower and archive your work FOREVER using CLOCKSS. Scholarly publishing tools for individual publishers (bloggers).
 
-== Features ==
+= Features =
 
 * Multi author blogs
 * Updates The Winnower when you click update in Wordpress
 * Retrieve DOI's of your posts from The Winnower and display them for citation on your paper.
 
-== Installation ==
-
-This plugin requires the [Piklist plugin](https://wordpress.org/plugins/piklist/) which provides components for us to build this plugin.
-
-The administrator of your blog will require an account with The Winnower and willingness to advance science. Authors currently only require a full name in their wordpress profile. Soon they'll be able to link with their own Winnower accounts.
-
-1. Install The Winnower Publisher and Piklist plugins
-1. In "The Winnower" settings in your admin dashboard save your api key. It can be found on your account page on thewinnower.com
-
-
-== Instructions ==
+= Instructions =
 
 1. On new or existing posts find "The Winnower Post Settings"
 1. Find "Cross-Post to The Winnower" and choose "Yes"
@@ -48,3 +38,12 @@ Currently only administrators may request a doi.
 1. Now update your paper to save the DOI.
 
 The DOI will now display for citation at the bottom of you post!
+
+== Installation ==
+
+This plugin requires the [Piklist plugin](https://wordpress.org/plugins/piklist/) which provides components for us to build this plugin.
+
+The administrator of your blog will require an account with The Winnower and willingness to advance science. Authors currently only require a full name in their wordpress profile. Soon they'll be able to link with their own Winnower accounts.
+
+1. Install The Winnower Publisher and Piklist plugins
+1. In "The Winnower" settings in your admin dashboard save your api key. It can be found on your account page on thewinnower.com
