@@ -9,7 +9,6 @@ License: GPLv2 or later
 Archiving and Aggregating “Alternative” Scholarly Content: DOIs for blogs.
 
 == Description ==
-
 Assign a CrossRef digital object identifier (DOI) to your blog via The Winnower and archive your work FOREVER using CLOCKSS. Scholarly publishing tools for individual publishers (bloggers).
 
 = Features =
@@ -29,7 +28,7 @@ Your post will now be posted to the winnower!
 
 = Getting your DOI =
 
-Currently only administrators may request a doi.
+Currently only administrators may request a DOI.
 
 1. Once your post has been published, find "You can request a DOI here." in "The Winnower Post Settings" click it and you will end up on the post's page at thewinnower.com. (Eg. `https://thewinnower.com/posts/what-are-winnower-authors-doing`)
 1. On your post's page click "Revise this Paper"
