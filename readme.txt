@@ -9,6 +9,7 @@ License: GPLv2 or later
 Archiving and Aggregating “Alternative” Scholarly Content: DOIs for blogs.
 
 == Description ==
+
 Assign a CrossRef digital object identifier (DOI) to your blog via The Winnower and archive your work FOREVER using CLOCKSS. Scholarly publishing tools for individual publishers (bloggers).
 
 = Features =
