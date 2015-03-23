@@ -3,7 +3,7 @@ Contributors: reconbot
 Tags: science, DOI, permanent archival, PDF, Winnower, open-access, peer review, CLOCKSS, digital object identifier, altmetrics, piklist
 Requires at least: 4.0
 Tested up to: 4.1.1
-Stable tag: trunk
+Stable tag: 1.6
 License: GPLv2 or later
 
 Archiving and Aggregating “Alternative” Scholarly Content: DOIs for blogs.
@@ -47,3 +47,12 @@ The administrator of your blog will require an account with The Winnower and wil
 
 1. Install The Winnower Publisher and Piklist plugins
 1. In "The Winnower" settings in your admin dashboard save your api key. It can be found on your account page on thewinnower.com
+
+== Changelog ==
+
+= 1.6 =
+* Topics now load more reliably.
+* We now give more descriptive error messages in more circumstances.
+* In the rare chance topics weren't loaded we will no longer prevent saving drafts or updating posts.
+* Better information about if you haven't saved your api key
+* Add some feedback if you have't filled out your names in your wordpress profile
