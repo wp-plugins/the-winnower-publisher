@@ -1,10 +1,20 @@
 <?php
 /*
-Title:
+Title: Publisher Settings
 Setting: winnower_publisher_settings
+Order: 2
 */
 
-$debug = $_GET['debug'];
+$debug = isset($_GET['debug']) ? true : false;
+
+if($debug){
+  echo '<pre>';
+  var_dump('winnower_publisher_settings', get_option('winnower_publisher_settings'));
+  var_dump('winnower_topics', get_option('winnower_topics'));
+  var_dump('winnower_topics_last_updated', get_option('winnower_topics_last_updated'));
+  echo '</pre>';
+}
+
 
 piklist('field', array(
   'type' => 'text',
@@ -50,13 +60,7 @@ piklist('field', array(
   'field' => 'api_endpoint',
 ));
 
-if($debug){
-  echo '<pre>';
-  var_dump(get_option('winnower_publisher_settings'));
-  echo '</pre>';
-}
-
-echo '<script>
+?><script>
     (function($){
       $(document).ready(function(){
         var status = $(".js-api-status");
@@ -74,8 +78,9 @@ echo '<script>
           var checkUrl = url + apiKey;
 
           if(!apiKey) {
-              status.text("Please enter an API Key.");
-              return;
+            $(".winnower_publisher_settings_api_key_confirmation").val("false");
+            status.text("Please enter an API Key.");
+            return;
           }
 
           status.text("Checking your API Key...");
@@ -84,7 +89,7 @@ echo '<script>
             url: checkUrl,
             statusCode: {
               503: function(){
-                status.text("We\'re having trouble communicating with TheWinnower.com, please try again in a few minutes.");
+                status.text("We're having trouble communicating with TheWinnower.com, please try again in a few minutes.");
               }
             },
             success: function(data){
@@ -104,5 +109,5 @@ echo '<script>
         checkKey();
       });
     })(jQuery);
-  </script>'
-;
+  </script>
+<?php

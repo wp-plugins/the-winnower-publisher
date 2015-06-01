@@ -6,7 +6,7 @@ Post Type: post
 
 piklist('field', array(
   'type' => 'radio',
-  'field' => 'win_toggle',
+  'field' => 'winnower_cross_publish',
   'label' => 'Cross-Post to The Winnower',
   'value' => 'false',
   'description' => 'Check this box to submit post to The Winnower',
@@ -21,10 +21,10 @@ function winnower_pubstatus() {
   global $post;
   $ID = $post->ID;
 
-  $status = get_post_meta($ID, 'pub', true);
+  $status = get_post_meta($ID, 'winnower_pub_status', true);
 
   if(empty($status)) {
-    $status = 'Not Yet Published';
+    $status = 'Not yet published';
   }
 
   return $status;
@@ -37,49 +37,54 @@ piklist('field', array(
   'value' => '<span class="pub-status" title="Paper ID: '. winnower_get_paper_id() .'">'. winnower_pubstatus() .'</span>',
   'conditions' => array(
     array(
-      'field' => 'win_toggle',
+      'field' => 'winnower_cross_publish',
       'value' => 'false',
       'compare' => '!='
     )
   )
 ));
 
-function winnower_get_topic_list($format) {
-  if( get_option('winnower_topics_set') == false || get_option('winnower_topics_set') != date('j') ) {
-    global $post;
-    $winnower_settings = get_option('winnower_publisher_settings');
-    $end_point = $winnower_settings['api_endpoint'];
-    $url = $end_point .'topics/';
-    $error_message = "We're having trouble communicating with TheWinnower.com, please try again in a few minutes.";
+function set_error($post, $message) {
+  update_post_meta($post->ID, 'winnower_pub_status', $message);
+  return;
+}
 
-    $response = wp_remote_get($url);
-
-    if(is_wp_error($response)) {
-      update_post_meta($post->ID, 'pub', $error_message . " " . $response->get_error_message());
-      return;
-    } else {
-      $response = $response['body'];
-
-      $decode = json_decode($response, true);
-      if(!is_array($decode['topics']) || empty($decode['topics'])){
-        update_post_meta($post->ID, 'pub', $error_message);
-        return;
-      }
-
-      update_option('winnower_topics', $decode);
-      update_option('winnower_topics_json', $response);
-      update_option('winnower_topics_set', date('j'));
-    }
+function winnower_fetch_topic_list() {
+  global $post;
+  $debug = isset($_REQUEST['debug']);
+  $oneday = 60 * 60 * 24;
+  if (!$debug && time() - get_option('winnower_topics_last_updated') < $oneday ) {
+    return get_option('winnower_topics');
   }
 
-  if($format == 'array') {
-    $topics = get_option('winnower_topics');
-  } else {
-    $topics = get_option('winnower_topics_json');
+  $winnower_settings = get_option('winnower_publisher_settings');
+  $end_point = $winnower_settings['api_endpoint'];
+  $url = $end_point .'topics/';
+  $error_message = "We're having trouble retrieving topics from The Winnower, please try again in a few minutes.";
+
+  $response = wp_remote_get($url, array('sslverify' => false));
+
+  if(is_wp_error($response)) {
+    return set_error($post, $error_message . " " . $response->get_error_message());
+  }
+  $encoded_body = $response['body'];
+
+  $body = json_decode($encoded_body, true);
+  if (!$body) {
+    return set_error($post, "$error_message Invalid JSON.");
   }
 
-  return $topics;
+  if (!is_array($body['topics']) || empty($body['topics'])){
+    return set_error($post, "$error_message Missing Topics.");
+  }
 
+  update_option('winnower_topics', $encoded_body);
+  update_option('winnower_topics_last_updated', time());
+  return $encoded_body;
+}
+
+function winnower_get_topic_list() {
+  return json_decode(winnower_fetch_topic_list(), true);
 }
 
 function winnower_create_parent_topic_list($data_array) {
@@ -107,13 +112,13 @@ piklist('field', array(
   'label' => 'Topic of Study',
   'description' => 'Required',
   'attributes' => array(
-    'class' => 'widefat',
-    'required' => 'required'
+    'class' => 'widefat'
+    // 'required' => 'required'
   ),
-  'choices' => winnower_create_parent_topic_list(winnower_get_topic_list('array')),
+  'choices' => winnower_create_parent_topic_list(winnower_get_topic_list()),
   'conditions' => array(
     array(
-      'field' => 'win_toggle',
+      'field' => 'winnower_cross_publish',
       'value' => 'false',
       'compare' => '!=',
       'reset' => 'false'
@@ -121,7 +126,8 @@ piklist('field', array(
   )
 ));
 
-function winnower_create_child_topic_list($data_array) {
+function winnower_create_child_topic_list() {
+  $data_array = winnower_get_topic_list();
   if(is_array($data_array)) {
     global $post;
     $post_ID = $post->ID;
@@ -154,10 +160,10 @@ for($i = 1; $i < 4; $i++) {
     'attributes' => array(
       'class' => 'widefat'
     ),
-    'choices' => winnower_create_child_topic_list(winnower_get_topic_list('array')),
+    'choices' => winnower_create_child_topic_list(),
     'conditions' => array(
       array(
-        'field' => 'win_toggle',
+        'field' => 'winnower_cross_publish',
         'value' => 'false',
         'compare' => '!=',
         'reset' => 'false'
@@ -172,7 +178,7 @@ echo '<script>
       var topicSelect = $("._post_meta_topic");
       var subTopicsSelect = $("select[class*=topic_child]");
       var subTopicOptions = "";
-      var topicsArr = ' . winnower_get_topic_list("json") . '.topics;
+      var topicsArr = ' . winnower_fetch_topic_list() . '.topics;
       var subTopicsArr = [];
 
       $.each(topicsArr, function(i, topic){
@@ -265,7 +271,7 @@ if(winnower_get_paper_id()) {
     ),
     'conditions' => array(
       array(
-        'field' => 'win_toggle',
+        'field' => 'winnower_cross_publish',
         'value' => 'false',
         'compare' => '!='
       )
@@ -284,7 +290,7 @@ if(winnower_get_paper_id()) {
       </p>',
     'conditions' => array(
       array(
-        'field' => 'win_toggle',
+        'field' => 'winnower_cross_publish',
         'value' => 'false',
         'compare' => '!='
       )
@@ -298,7 +304,7 @@ if(winnower_get_paper_id()) {
     'value' => "DOI's can be requested for published papers.",
     'conditions' => array(
       array(
-        'field' => 'win_toggle',
+        'field' => 'winnower_cross_publish',
         'value' => 'false',
         'compare' => '!='
       )
@@ -343,12 +349,12 @@ echo '<script>
                 statusMessage.text("You must click update on this post to save the DOI. It was assigned "+assignedAt);
                 $("._post_meta_doi-assigned").val(assignedAt);
                 $("._post_meta_updatable").val(""+updatable);
-                $(".pub-status").text("This is paper has a DOI and will not update on The Winnower.");
+                $(".pub-status").text("This paper has a DOI and will not update on The Winnower.");
               } else {
                 doiField.val("");
                 statusMessage.text("");
                 $("._post_meta_doi-assigned").val("");
-                requestMessage.text("There no DOI currently assigned to this paper.");
+                requestMessage.text("A DOI is not currently assigned to this paper.");
               }
             })
             .fail(function(jqhxr, statusText, err){
