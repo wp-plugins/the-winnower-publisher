@@ -2,7 +2,7 @@
 Contributors: reconbot
 Tags: science, DOI, permanent archival, PDF, Winnower, open-access, peer review, CLOCKSS, digital object identifier, altmetrics, piklist
 Requires at least: 4.0
-Tested up to: 4.1.1
+Tested up to: 4.2.2
 Stable tag: 1.7
 License: GPLv2 or later
 
