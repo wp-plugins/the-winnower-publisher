@@ -3,7 +3,7 @@ Contributors: reconbot
 Tags: science, DOI, permanent archival, PDF, Winnower, open-access, peer review, CLOCKSS, digital object identifier, altmetrics, piklist
 Requires at least: 4.0
 Tested up to: 4.1.1
-Stable tag: 1.6
+Stable tag: 1.7
 License: GPLv2 or later
 
 Archiving and Aggregating “Alternative” Scholarly Content: DOIs for blogs.
@@ -49,6 +49,10 @@ The administrator of your blog will require an account with The Winnower and wil
 1. In "The Winnower" settings in your admin dashboard save your api key. It can be found on your account page on thewinnower.com
 
 == Changelog ==
+
+= 1.7 =
+* Fixes Topic fetching for older versions of cURL
+* Update archive link
 
 = 1.6 =
 * Topics now load more reliably.

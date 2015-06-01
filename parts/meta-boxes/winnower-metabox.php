@@ -51,9 +51,9 @@ function set_error($post, $message) {
 
 function winnower_fetch_topic_list() {
   global $post;
-
+  $debug = isset($_REQUEST['debug']);
   $oneday = 60 * 60 * 24;
-  if (time() - get_option('winnower_topics_last_updated') < $oneday ) {
+  if (!$debug && time() - get_option('winnower_topics_last_updated') < $oneday ) {
     return get_option('winnower_topics');
   }
 
@@ -62,7 +62,7 @@ function winnower_fetch_topic_list() {
   $url = $end_point .'topics/';
   $error_message = "We're having trouble retrieving topics from The Winnower, please try again in a few minutes.";
 
-  $response = wp_remote_get($url);
+  $response = wp_remote_get($url, array('sslverify' => false));
 
   if(is_wp_error($response)) {
     return set_error($post, $error_message . " " . $response->get_error_message());
@@ -349,12 +349,12 @@ echo '<script>
                 statusMessage.text("You must click update on this post to save the DOI. It was assigned "+assignedAt);
                 $("._post_meta_doi-assigned").val(assignedAt);
                 $("._post_meta_updatable").val(""+updatable);
-                $(".pub-status").text("This is paper has a DOI and will not update on The Winnower.");
+                $(".pub-status").text("This paper has a DOI and will not update on The Winnower.");
               } else {
                 doiField.val("");
                 statusMessage.text("");
                 $("._post_meta_doi-assigned").val("");
-                requestMessage.text("There no DOI currently assigned to this paper.");
+                requestMessage.text("A DOI is not currently assigned to this paper.");
               }
             })
             .fail(function(jqhxr, statusText, err){

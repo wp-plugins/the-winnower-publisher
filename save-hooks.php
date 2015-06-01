@@ -85,6 +85,7 @@ function winnower_post_published($ID, $post) {
   $url = $api_endpoint . "papers/?api_key=" . $api_key;
 
   $req_array = array(
+    'sslverify' => false,
     'method' => 'POST',
     'timeout' => 30,
     'headers' => array(
