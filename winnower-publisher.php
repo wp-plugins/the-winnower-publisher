@@ -4,7 +4,7 @@ Plugin Name: The Winnower Publisher
 Plugin URI: https://thewinnower.com
 Description: Publish, peer review and get cited with your own DOI by cross posting to thewinnower.com.
 Author: The Winnower
-Version: 1.6
+Version: 1.7
 Author URI: https://thewinnower.com
 Plugin Type: Piklist
 License: GPL2
